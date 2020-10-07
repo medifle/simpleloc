@@ -1,0 +1,127 @@
+{
+    "Java": {
+        "extensions": [
+          "java"
+        ],
+        "line_comment": [
+          "//"
+        ],
+        "multi_line": [
+          [
+            "/*",
+            "*/"
+          ]
+        ],
+        "quotes": [
+          {
+            "end": "\"",
+            "start": "\""
+          }
+        ]
+      },
+    "JavaScript": {
+        "extensions": [
+          "js",
+          "mjs"
+        ],
+        "line_comment": [
+          "//"
+        ],
+        "multi_line": [
+          [
+            "/*",
+            "*/"
+          ]
+        ],
+        "quotes": [
+          {
+            "end": "\"",
+            "start": "\""
+          }
+        ]
+    },
+    "Go": {
+        "extensions": [
+            "go"
+        ],
+        "line_comment": [
+            "//"
+        ],
+        "multi_line": [
+            [
+                "/*",
+                "*/"
+            ]
+        ],
+        "quotes": [
+            {
+                "end": "\"",
+                "start": "\""
+            },
+            {
+                "end": "`",
+                "start": "`"
+            }
+        ]
+    },
+    "C": {
+        "extensions": [
+            "c"
+        ],
+        "line_comment": [
+            "//"
+        ],
+        "multi_line": [
+            [
+                "/*",
+                "*/"
+            ]
+        ],
+        "quotes": [
+            {
+                "end": "\"",
+                "start": "\""
+            }
+        ]
+    },
+    "C++": {
+        "extensions": [
+            "cc",
+            "cpp"
+        ],
+        "line_comment": [
+            "//"
+        ],
+        "multi_line": [
+            [
+                "/*",
+                "*/"
+            ]
+        ],
+        "quotes": [
+            {
+                "end": "\"",
+                "start": "\""
+            }
+        ]
+    },
+    "Python": {
+        "extensions": [
+            "py"
+        ],
+        "line_comment": [
+            "#"
+        ],
+        "multi_line": [],
+        "quotes": [
+            {
+                "end": "\"",
+                "start": "\""
+            },
+            {
+                "end": "'",
+                "start": "'"
+            }
+        ]
+    }
+}
