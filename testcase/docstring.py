@@ -1,10 +1,10 @@
 def foo():
-    """A multi-line
+    """A multiline
     docstring.
     """
 
 def bar():
     """
-    A multi-line
+    A multiline
     docstring.
     """

@@ -113,6 +113,7 @@ func IsDirectory(path string) bool {
 func Process() {
 	// Parse CLI argument
 	if len(os.Args) <= 1 {
+		// TODO: publish as Go module
 		fmt.Println("usage: simpleloc <filepath>")
 		return
 	}

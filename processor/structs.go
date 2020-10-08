@@ -27,7 +27,7 @@ type LanguageFeature struct {
 	Quotes             []Quote
 }
 
-// OpenClose is used for matching a open-close pair. E.g. multiline comments
+// OpenClose is used for matching a open-close pair, e.g. multiline comments
 type OpenClose struct {
 	Open  []byte
 	Close []byte

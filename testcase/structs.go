@@ -21,7 +21,7 @@ type Language struct {
 }
 
 const (
-    TODO int = 1
+	TODO int = 1
 )
 
 // TODO: this is a todo
@@ -33,14 +33,13 @@ const (
 
 // LanguageFeature is a struct which is converted from Language to do matching
 type LanguageFeature struct {
-	SingleLineComments [][]byte // trailing
-	MultiLineComments  []OpenClose
-	Quotes             []Quote/*
- * sdfsdf
- */
+	SingleLineComments [][]byte    // trailing
+	MultiLineComments  []OpenClose // TODO trailing
+	Quotes             []Quote     /*
+	 * sdfsdf
+	 */
 }
 
-// OpenClose is used for matching a open-close pair. E.g. multi-line comments
 type OpenClose struct {
 	Open  []byte
 	Close []byte

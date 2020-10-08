@@ -14,12 +14,12 @@ const (
 	SString
 )
 
-// state machine for counting lines
+// State machine for counting lines
 type machine struct {
 	state    stateType
-	index    int
-	endIndex int
-	endMatch []byte
+	index    int    // Always index <= endIndex
+	endIndex int    // Store the last byte index of the file content
+	endMatch []byte // Store closing marker, e.g. "*/" in ["/*", "*/"]
 }
 
 func (m *machine) resetState() {
@@ -61,7 +61,6 @@ func checkForMatchSingle(file *File, m *machine, match []byte) bool {
 }
 
 // Match single comment marker
-// Assume index <= endIndex in machine
 func checkForMatch(file *File, m *machine, matches [][]byte) bool {
 	currentByte := file.Content[m.index]
 
@@ -86,12 +85,12 @@ func checkForMatch(file *File, m *machine, matches [][]byte) bool {
 }
 
 // Match multiline comment open marker, e.g "/*" for ["/*", "*/"] pair
-// Assume index <= endIndex in machine
 func checkForMatchMultiOpen(file *File, m *machine, matches []OpenClose) int {
 	currentByte := file.Content[m.index]
 
 	// In case we have more than one type of matches in one language
 	for i := 0; i < len(matches); i++ {
+		// Probe the first byte first to improve performance
 		if currentByte == matches[i].Open[0] {
 			potentialMatch := true
 
@@ -115,7 +114,6 @@ func checkForMatchMultiOpen(file *File, m *machine, matches []OpenClose) int {
 func checkForQuotesMatch(file *File, m *machine, matches []Quote) int {
 	currentByte := file.Content[m.index]
 
-	// In case we have more than one type of matches in one language
 	for i := 0; i < len(matches); i++ {
 		if currentByte == matches[i].Start[0] {
 			potentialMatch := true
@@ -137,7 +135,7 @@ func checkForQuotesMatch(file *File, m *machine, matches []Quote) int {
 	return 0
 }
 
-func singleCommentState(file *File, m *machine, langFeature LanguageFeature) {
+func singleCommentState(file *File, m *machine) {
 	for ; m.index < m.endIndex; m.index++ {
 		// Remain in the same comment state when we hit the end of line
 		if file.Content[m.index] == '\n' {
@@ -151,7 +149,7 @@ func singleCommentState(file *File, m *machine, langFeature LanguageFeature) {
 	}
 }
 
-func multiCommentState(file *File, m *machine, langFeature LanguageFeature) {
+func multiCommentState(file *File, m *machine) {
 	for ; m.index < m.endIndex; m.index++ {
 		// Remain in the same comment state when we hit the end of line
 		if file.Content[m.index] == '\n' {
@@ -187,7 +185,7 @@ func stringState(file *File, m *machine) {
 
 		// Go back to Code state
 		// It is safe to check escape char because if we enter string state at index 0, we need to go to next byte first
-		// before enter this function call
+		// before entering this function call
 		if file.Content[m.index-1] != '\\' && checkForMatchSingle(file, m, m.endMatch) {
 			m.state = SCode
 			return
@@ -273,9 +271,9 @@ func countStats(file *File) {
 			case SString:
 				stringState(file, m)
 			case SSingleComment, SSingleCodeComment: // All SingleComment-ish states enter the same function
-				singleCommentState(file, m, langFeature)
+				singleCommentState(file, m)
 			case SMultiComment, SMultiCodeComment: // All MultiComment-ish states enter the same function
-				multiCommentState(file, m, langFeature)
+				multiCommentState(file, m)
 			case SBlank, SMultiCommentBlank, SMultiCodeCommentBlank: // All blank-ish states enter the same function
 				blankState(file, m, langFeature)
 			}
