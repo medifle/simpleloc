@@ -5,7 +5,6 @@ import (
 	"fmt"
 	jsoniter "github.com/json-iterator/go"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -93,10 +92,14 @@ func printStats(file *File) {
 	fmt.Println()
 }
 
-func getExtension(filePath string) string {
+func getExtension(filePath string) (string, error) {
 	extension := filepath.Ext(filePath)
+	if len(extension) == 0 {
+		return "", fmt.Errorf("file extension is empty\n")
+	}
+
 	extension = strings.ToLower(extension)
-	return strings.Split(extension, ".")[1]
+	return strings.Split(extension, ".")[1], nil
 }
 
 func IsDirectory(path string) bool {
@@ -123,10 +126,16 @@ func Process() {
 	// Read the entire file content into memory
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
 
-	extension := getExtension(filePath)
+	extension, err := getExtension(filePath)
+	if err != nil {
+		fmt.Printf(err.Error())
+		return
+	}
+
 	file := &File{
 		Extension: extension,
 		Content:   content,
