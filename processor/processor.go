@@ -26,7 +26,7 @@ func ProcessConstants(extension string) error {
 	}
 	languageName, ok := ExtensionToLanguage[extension]
 	if !ok {
-		return fmt.Errorf("language %s is not supported", languageName)
+		return fmt.Errorf("extension %s is not supported", extension)
 	}
 
 	/*
