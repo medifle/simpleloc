@@ -42,12 +42,11 @@ func isWhitespace(currentByte byte) bool {
 
 func checkForMatchSingle(file *File, m *machine, match []byte) bool {
 	currentByte := file.Content[m.index]
-	index := m.index
 
 	if currentByte == match[0] {
 		potentialMatch := true
 		for j := 1; j < len(match); j++ {
-			if index+j > m.endIndex || file.Content[index+j] != match[j] {
+			if m.index+j > m.endIndex || file.Content[m.index+j] != match[j] {
 				potentialMatch = false
 				break
 			}
@@ -65,6 +64,7 @@ func checkForMatchSingle(file *File, m *machine, match []byte) bool {
 // Assume index <= endIndex in machine
 func checkForMatch(file *File, m *machine, matches [][]byte) bool {
 	currentByte := file.Content[m.index]
+
 	for i := 0; i < len(matches); i++ {
 		if currentByte == matches[i][0] {
 			potentialMatch := true
@@ -89,6 +89,7 @@ func checkForMatch(file *File, m *machine, matches [][]byte) bool {
 // Assume index <= endIndex in machine
 func checkForMatchMultiOpen(file *File, m *machine, matches []OpenClose) int {
 	currentByte := file.Content[m.index]
+
 	// In case we have more than one type of matches in one language
 	for i := 0; i < len(matches); i++ {
 		if currentByte == matches[i].Open[0] {
@@ -113,6 +114,7 @@ func checkForMatchMultiOpen(file *File, m *machine, matches []OpenClose) int {
 
 func checkForQuotesMatch(file *File, m *machine, matches []Quote) int {
 	currentByte := file.Content[m.index]
+
 	// In case we have more than one type of matches in one language
 	for i := 0; i < len(matches); i++ {
 		if currentByte == matches[i].Start[0] {
@@ -135,10 +137,22 @@ func checkForQuotesMatch(file *File, m *machine, matches []Quote) int {
 	return 0
 }
 
-// Only multiline comments are possible in this function
-func commentState(file *File, m *machine, langFeature LanguageFeature) {
+func singleCommentState(file *File, m *machine, langFeature LanguageFeature) {
 	for ; m.index < m.endIndex; m.index++ {
+		// Remain in the same comment state when we hit the end of line
+		if file.Content[m.index] == '\n' {
+			return
+		}
 
+		// Match TODOs
+		if checkForMatchSingle(file, m, []byte("TODO")) {
+			file.Todo++
+		}
+	}
+}
+
+func multiCommentState(file *File, m *machine, langFeature LanguageFeature) {
+	for ; m.index < m.endIndex; m.index++ {
 		// Remain in the same comment state when we hit the end of line
 		if file.Content[m.index] == '\n' {
 			return
@@ -166,7 +180,6 @@ func commentState(file *File, m *machine, langFeature LanguageFeature) {
 
 func stringState(file *File, m *machine) {
 	for ; m.index < m.endIndex; m.index++ {
-
 		// Remain in String state when we hit the end of line
 		if file.Content[m.index] == '\n' {
 			return
@@ -184,7 +197,6 @@ func stringState(file *File, m *machine) {
 
 func codeState(file *File, m *machine, langFeature LanguageFeature) {
 	for ; m.index < m.endIndex; m.index++ {
-
 		// Remain in Code state when we hit the end of line
 		if file.Content[m.index] == '\n' {
 			return
@@ -260,8 +272,10 @@ func countStats(file *File) {
 				codeState(file, m, langFeature)
 			case SString:
 				stringState(file, m)
+			case SSingleComment, SSingleCodeComment: // All SingleComment-ish states enter the same function
+				singleCommentState(file, m, langFeature)
 			case SMultiComment, SMultiCodeComment: // All MultiComment-ish states enter the same function
-				commentState(file, m, langFeature)
+				multiCommentState(file, m, langFeature)
 			case SBlank, SMultiCommentBlank, SMultiCodeCommentBlank: // All blank-ish states enter the same function
 				blankState(file, m, langFeature)
 			}

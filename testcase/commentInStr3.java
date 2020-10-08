@@ -1,0 +1,3 @@
+string.Format(" /* comment " +
+  " something " +
+  " */ ");
